@@ -16,8 +16,8 @@ function Square(props: SquareProps) {
       style={divStyle}
       onClick={() => props.onClick()} >
         {props.flipped
-          ? <img src={require("./peppa1.png")} alt=""></img>
-          : <img src={require("./peppa2.png")} alt=""></img>
+          ? <img src={require(`${props.url}`)} alt=""></img>
+          : <img src={require("./peppa.png")} alt=""></img>
         }
     </span> 
   );
@@ -36,13 +36,23 @@ interface GameState {
   squares: SquareData[]
 }
 
+function shuffle(a: any[]) {
+  for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 class Game extends React.Component<GameProps, GameState> {
   myRef: React.RefObject<HTMLDivElement>;
 
   constructor(props: GameProps) {
     super(props)
+    const arr = [...Array(props.numberOfSquares)].map((ign, _) => _%(props.numberOfSquares / 2))
+    shuffle(arr)
     this.state = {
-      squares: [...Array(props.numberOfSquares)].map(_ => ({url: "./peppa1.png", solved: false, flipped: false}))
+      squares: [...Array(props.numberOfSquares)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false}))
     }
     this.myRef = React.createRef();
   }
