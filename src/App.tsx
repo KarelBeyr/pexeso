@@ -73,6 +73,13 @@ class Game extends React.Component<GameProps, GameState> {
   {
     console.log("handling click" + i)
     const s = this.state.squares.slice();
+    const flippedNonSolved = s.filter(_ => _.flipped === true && _.solved === false)
+    if (flippedNonSolved.length === 2) {
+      if (flippedNonSolved[0].url === flippedNonSolved[1].url) 
+        flippedNonSolved.forEach(_ => _.solved = true)
+      else
+        flippedNonSolved.forEach(_ => _.flipped = false)
+    }
     s[i].flipped = true;
     this.setState({
       squares: s
