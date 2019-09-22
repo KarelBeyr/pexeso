@@ -15,7 +15,10 @@ function Square(props: SquareProps) {
       className="square"
       style={divStyle}
       onClick={() => props.onClick()} >
-      {/* <img src={require("./peppa1.png")} alt=""></img> */}
+        {props.flipped
+          ? <img src={require("./peppa1.png")} alt=""></img>
+          : <img src={require("./peppa2.png")} alt=""></img>
+        }
     </span> 
   );
 }
@@ -39,7 +42,7 @@ class Game extends React.Component<GameProps, GameState> {
   constructor(props: GameProps) {
     super(props)
     this.state = {
-      squares: Array(props.numberOfSquares).fill({url: "./peppa1.png", solved: false, flipped: false})
+      squares: [...Array(props.numberOfSquares)].map(_ => ({url: "./peppa1.png", solved: false, flipped: false}))
     }
     this.myRef = React.createRef();
   }
@@ -48,7 +51,7 @@ class Game extends React.Component<GameProps, GameState> {
     console.log("rendering square " + i)
     return <Square 
       key={i}  
-      onClick={() => alert(1)}
+      onClick={() => this.handleClick(i)}
       flipped={this.state.squares[i].flipped}
       solved={this.state.squares[i].solved}
       url={this.state.squares[i].url}
@@ -59,20 +62,14 @@ class Game extends React.Component<GameProps, GameState> {
   handleClick(i: number): void
   {
     console.log("handling click" + i)
-    // const h = this.state.history;
-    // const squares = [...h[h.length - 1].squares];
-    // const nextTurn = this.state.nextTurn;
-    // squares[i] = nextTurn
-    // h.push({squares: squares})
-    // this.setState({
-    //   history: h,
-    //   nextTurn: (nextTurn === 'X' ? 'O' : 'X')
-    // })
-    // console.log(JSON.stringify(this.state.history))
+    const s = this.state.squares.slice();
+    s[i].flipped = true;
+    this.setState({
+      squares: s
+    })
   }
 
   render() {
-//    console.log("rendering game board with squares " + this.state.history[this.state.history.length - 1])
     return <div className="game">
       {Array(this.props.numberOfSquares).fill(null).map((n, idx) => this.renderSquare(idx))}
     </div>;
