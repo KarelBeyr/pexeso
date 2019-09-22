@@ -6,14 +6,9 @@
   flex-flow: row;
 }
 
-.square:before{
-  content: '';
-  padding: 50% 0; /* vertical value as  100% equals width */
-  display: inline-block;
-}
-
 .square {
-  width: 35%;
+  width: 100px;
+  height: 100px;
   background: red;
   border: 1px solid black;
 }
@@ -22,10 +17,10 @@
 </style>
 <body>
 <div class="game">
-  <div class="square"></div>
-  <div class="square"></div>
-  <div class="square"></div>
-  <div class="square"></div>
+  <span class="square"></span>
+  <span class="square"></span>
+  <span class="square"></span>
+  <span class="square"></span>
 </div>
 </body>
 </html>

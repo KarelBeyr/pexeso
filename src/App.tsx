@@ -1,69 +1,36 @@
 import React from 'react';
 import './App.css';
 
-interface SquareProps {
-  value: string
+interface SquareProps extends SquareData {
   onClick: () => void
+  squareSide: number
 }
 function Square(props: SquareProps) {
   const divStyle = {
-    top: '30%',
-    left: '30%',
+    width: props.squareSide + 'px',
+    height: props.squareSide + 'px',
   }
   return (
-    <div
+    <span
       className="square"
       style={divStyle}
       onClick={() => props.onClick()} >
-      {props.value}
-      <img src={require("./peppa1.png")}></img>
-    </div> 
+      {/* <img src={require("./peppa1.png")} alt=""></img> */}
+    </span> 
   );
 }
 
-interface BoardProps {
-  squares: string[]
-  onClick: (i: number) => void
-  nextTurn: string
+interface GameProps {
+  numberOfSquares: number
+  squareSide: number
 }
-
-class Board extends React.Component<BoardProps> {
-  renderSquare(i: number) {
-    console.log("rendering square " + i)
-    return <Square 
-      value={this.props.squares[i]}
-      onClick={() => this.props.onClick(i)}
-    />;
-  }
-
-  render() {
-    const status = 'Next player: ' + this.props.nextTurn;
-
-    return (
-      <>
-        {this.renderSquare(0)}
-        {this.renderSquare(1)}
-        {this.renderSquare(2)}
-        {this.renderSquare(3)}
-        {this.renderSquare(4)}
-        {this.renderSquare(5)}
-        {this.renderSquare(6)}
-        {this.renderSquare(7)}
-        {this.renderSquare(8)}
-        </>
-    );
-  }
-}
-
-interface GameProps {}
-interface HistoryItem {
-  squares: string[]
+interface SquareData {
+  url: string
+  solved: boolean
+  flipped: boolean
 }
 interface GameState {
-  history: HistoryItem[]
-  nextTurn: string
-  width: number
-  height: number
+  squares: SquareData[]
 }
 
 class Game extends React.Component<GameProps, GameState> {
@@ -72,67 +39,49 @@ class Game extends React.Component<GameProps, GameState> {
   constructor(props: GameProps) {
     super(props)
     this.state = {
-      history: [{
-        squares: Array(9).fill(null)
-      }],
-      nextTurn: 'X',
-      width: 0,
-      height: 0,
+      squares: Array(props.numberOfSquares).fill({url: "./peppa1.png", solved: false, flipped: false})
     }
     this.myRef = React.createRef();
   }
 
-  componentDidMount() {
-    const elm = this.myRef.current!
-    const height = elm.clientHeight
-    const width = elm.clientWidth
-//    this.setState({ height });
-    console.log("H: " + height + " w: " + width)
-  }
-
-  componentDidUpdate() {
-    const elm = this.myRef.current!
-    const height = elm.clientHeight
-    const width = elm.clientWidth
-//    this.setState({ height });
-    console.log("H: " + height + " w: " + width)
+  renderSquare(i: number) {
+    console.log("rendering square " + i)
+    return <Square 
+      key={i}  
+      onClick={() => alert(1)}
+      flipped={this.state.squares[i].flipped}
+      solved={this.state.squares[i].solved}
+      url={this.state.squares[i].url}
+      squareSide={this.props.squareSide}
+    />;
   }
 
   handleClick(i: number): void
   {
     console.log("handling click" + i)
-    const h = this.state.history;
-    const squares = [...h[h.length - 1].squares];
-    const nextTurn = this.state.nextTurn;
-    squares[i] = nextTurn
-    h.push({squares: squares})
-    this.setState({
-      history: h,
-      nextTurn: (nextTurn === 'X' ? 'O' : 'X')
-    })
-    console.log(JSON.stringify(this.state.history))
+    // const h = this.state.history;
+    // const squares = [...h[h.length - 1].squares];
+    // const nextTurn = this.state.nextTurn;
+    // squares[i] = nextTurn
+    // h.push({squares: squares})
+    // this.setState({
+    //   history: h,
+    //   nextTurn: (nextTurn === 'X' ? 'O' : 'X')
+    // })
+    // console.log(JSON.stringify(this.state.history))
   }
 
   render() {
-    console.log("rendering game board with squares " + this.state.history[this.state.history.length - 1])
-    return (
-      <div 
-        className="game"
-        ref={this.myRef}
-      >
-        <Board 
-          squares={this.state.history[this.state.history.length - 1].squares} 
-          onClick={(i: number) => this.handleClick(i)} 
-          nextTurn={this.state.nextTurn}
-        />
-      </div>
-    );
+//    console.log("rendering game board with squares " + this.state.history[this.state.history.length - 1])
+    return <div className="game">
+      {Array(this.props.numberOfSquares).fill(null).map((n, idx) => this.renderSquare(idx))}
+    </div>;
   }
 }
 
 const App: React.FC = () => {
   return (
-    <Game />
+    <Game numberOfSquares={6} squareSide={150}/>
   );
 }
 
