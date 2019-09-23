@@ -8,6 +8,10 @@ body {
   border: 1px solid black;
 }
 
+.invalidSquare {
+  border-color: blue;
+}
+
 .square img {
   width: 100%;
 }
