@@ -1,15 +1,12 @@
 import React from 'react';
 import './App.css';
 import UIfx from 'uifx'
-//import bellAudio from './bump.mp3'
 
-const bell = new UIfx(
-  require("./bump.mp3"),
-  // {
-  //   volume: 0.4, // number between 0.0 ~ 1.0
-  //   throttleMs: 100
-  // }
-)
+//sounds from www.myinstants.com
+
+const bell = new UIfx(require("./bump.mp3"))
+const wrong = new UIfx(require("./wrong.mp3"))
+const hooray = new UIfx(require("./hooray.mp3"))
 
 interface SquareProps extends SquareData {
   onClick: () => void
@@ -100,8 +97,11 @@ class Game extends React.Component<GameProps, GameState> {
     const s = this.state.squares.slice();
     const flippedNonSolved = s.filter(_ => _.flipped === true && _.solved === false)
     if (flippedNonSolved.length === 2) {
-      if (flippedNonSolved[0].url === flippedNonSolved[1].url) 
+      if (flippedNonSolved[0].url === flippedNonSolved[1].url) {
         flippedNonSolved.forEach(_ => _.solved = true)
+        hooray.play()
+      }
+
     }
     if (s.filter(_ => _.solved === false).length === 0) alert("finish")
     this.setState({
@@ -111,14 +111,15 @@ class Game extends React.Component<GameProps, GameState> {
 
   handleClick(i: number): void {
     console.log("handling click" + i)
-    bell.play()
     const s = this.state.squares.slice();
     if (this.state.squares[i].flipped === true) {
+      wrong.play()
       console.log("not possible to click on " + i)
       s[i].invalid = true;
       this.setState({squares: s})
       return;
     }
+    bell.play()
 
     this.flipNonSolved();
     s[i].flipped = true;
