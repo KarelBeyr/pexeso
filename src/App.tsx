@@ -23,25 +23,39 @@ interface SquareProps extends SquareData {
   onClick: () => void
   squareSide: number
 }
-function Square(props: SquareProps) {
-  const divStyle = {
-    width: props.squareSide + 'px',
-    height: props.squareSide + 'px',
+
+class Square extends React.Component<SquareProps> {
+  constructor(props: SquareProps) {
+    super(props)
   }
-  let cn = "square";
-  if (props.invalid === true) cn = cn + " invalidSquare";
-  console.log(cn)
-  return (
-    <span
-      className={cn}
-      style={divStyle}
-      onClick={() => props.onClick()} >
-        {props.flipped
-          ? <img src={require(`${props.url}`)} alt=""></img>
-          : <img src={require("./peppa.png")} alt=""></img>
-        }
-    </span> 
-  );
+
+  shouldComponentUpdate(nextProps: SquareProps, nextState: any) {
+    if (nextProps.flipped !== this.props.flipped) return true;
+    if (nextProps.invalid !== this.props.invalid) return true;
+    return false;
+  }
+
+  render() {
+    console.log("rendering square ")
+    const props = this.props
+    const divStyle = {
+      width: props.squareSide + 'px',
+      height: props.squareSide + 'px',
+    }
+    let cn = "square";
+    if (props.invalid === true) cn = cn + " invalidSquare";
+    return (
+      <span
+        className={cn}
+        style={divStyle}
+        onClick={() => props.onClick()} >
+          {props.flipped
+            ? <img src={require(`${props.url}`)} alt=""></img>
+            : <img src={require("./peppa.png")} alt=""></img>
+          }
+      </span> 
+    );
+  }
 }
 
 interface GameProps {
@@ -81,7 +95,6 @@ class Game extends React.Component<GameProps, GameState> {
   }
 
   renderSquare(i: number) {
-    console.log("rendering square " + i)
     return <Square 
       key={i}  
       onClick={() => this.handleClick(i)}
@@ -146,6 +159,7 @@ class Game extends React.Component<GameProps, GameState> {
       wrong.play()
       console.log("not possible to click on " + i)
       s[i].invalid = true;
+      alert(s[0] === this.state.squares[0])
       console.log("SETTING NEW STATE");
       this.setState({squares: s})
       setTimeout(() => this.clearInvalid(i), 500)
@@ -172,7 +186,7 @@ class Game extends React.Component<GameProps, GameState> {
 
 const App: React.FC = () => {
   return (
-    <Game numberOfPairs={1} squareSide={150}/>
+    <Game numberOfPairs={3} squareSide={150}/>
   );
 }
 
