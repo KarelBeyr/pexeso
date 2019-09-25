@@ -8,6 +8,17 @@ const bell = new UIfx(require("./bump.mp3"))
 const wrong = new UIfx(require("./wrong.mp3"))
 const hooray = new UIfx(require("./hooray.mp3"))
 
+function FinishedComponent() {
+  console.log("rendering finished component")
+  const trophies = ["./trophy.png", "./trophy.jpg", "./trophy2.jpg"]
+  const randomTrophy = trophies[Math.floor(Math.random() * trophies.length)];
+  return (
+    <div className={"finishedDiv"}>
+      <img src={require(`${randomTrophy}`)} alt=""></img>
+    </div> 
+  );
+}
+
 interface SquareProps extends SquareData {
   onClick: () => void
   squareSide: number
@@ -45,6 +56,7 @@ interface SquareData {
 }
 interface GameState {
   squares: SquareData[]
+  finished: boolean
 }
 
 function shuffle(a: any[]) {
@@ -63,7 +75,8 @@ class Game extends React.Component<GameProps, GameState> {
     const arr = [...Array(props.numberOfPairs * 2)].map((ign, _) => _%(props.numberOfPairs))
     shuffle(arr)
     this.state = {
-      squares: [...Array(props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false, invalid: false}))
+      squares: [...Array(props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false, invalid: false})),
+      finished: false,
     }
   }
 
@@ -86,10 +99,11 @@ class Game extends React.Component<GameProps, GameState> {
     const flippedNonSolved = s.filter(_ => _.flipped === true && _.solved === false)
     if (flippedNonSolved.length === 2) {
         flippedNonSolved.forEach(_ => _.flipped = false)
-    }
-    this.setState({
-      squares: s
-    })
+        console.log("SETTING NEW STATE");
+        this.setState({
+          squares: s
+        })
+      }
   }
 
   solveFlipped() {
@@ -100,13 +114,29 @@ class Game extends React.Component<GameProps, GameState> {
       if (flippedNonSolved[0].url === flippedNonSolved[1].url) {
         flippedNonSolved.forEach(_ => _.solved = true)
         hooray.play()
-      }
+        console.log("SETTING NEW STATE (BECAUSE FOUND MATCH)");
+        this.setState({
+          squares: s
+        })
+          }
 
     }
-    if (s.filter(_ => _.solved === false).length === 0) alert("finish")
-    this.setState({
-      squares: s
-    })
+    if (s.filter(_ => _.solved === false).length === 0) {
+      this.setState({
+        finished: true
+      })
+     //   alert("finish")
+    }
+  }
+
+  clearInvalid(i: number) {
+    console.log("clearing invalid" + i)
+    const s = this.state.squares.slice();
+    if (this.state.squares[i].invalid === true) {
+      s[i].invalid = false;
+      console.log("SETTING NEW STATE");
+      this.setState({squares: s})
+    }
   }
 
   handleClick(i: number): void {
@@ -116,13 +146,16 @@ class Game extends React.Component<GameProps, GameState> {
       wrong.play()
       console.log("not possible to click on " + i)
       s[i].invalid = true;
+      console.log("SETTING NEW STATE");
       this.setState({squares: s})
+      setTimeout(() => this.clearInvalid(i), 500)
       return;
     }
     bell.play()
 
     this.flipNonSolved();
     s[i].flipped = true;
+    console.log("SETTING NEW STATE (BECAUSE CLICKED)");
     this.setState({squares: s})
     setTimeout(() => this.solveFlipped(), 500)
     if (this.myTimeout) clearTimeout(this.myTimeout)
@@ -132,13 +165,14 @@ class Game extends React.Component<GameProps, GameState> {
   render() {
     return <div className="game">
       {Array(this.props.numberOfPairs * 2).fill(null).map((n, idx) => this.renderSquare(idx))}
+      {(this.state.finished === true) ? <FinishedComponent /> : ""}
     </div>;
   }
 }
 
 const App: React.FC = () => {
   return (
-    <Game numberOfPairs={4} squareSide={150}/>
+    <Game numberOfPairs={1} squareSide={150}/>
   );
 }
 
