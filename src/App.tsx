@@ -48,7 +48,7 @@ class Square extends React.Component<SquareProps> {
       <span
         className={cn}
         style={divStyle}
-        onClick={() => props.onClick()} >
+        onMouseDown={() => props.onClick()} >
           {props.flipped
             ? <img src={require(`${props.url}`)} alt=""></img>
             : <img src={require("./peppa.png")} alt=""></img>
@@ -159,7 +159,6 @@ class Game extends React.Component<GameProps, GameState> {
       wrong.play()
       console.log("not possible to click on " + i)
       s[i].invalid = true;
-      alert(s[0] === this.state.squares[0])
       console.log("SETTING NEW STATE");
       this.setState({squares: s})
       setTimeout(() => this.clearInvalid(i), 500)
