@@ -7,14 +7,20 @@ import UIfx from 'uifx'
 const bell = new UIfx(require("./bump.mp3"))
 const wrong = new UIfx(require("./wrong.mp3"))
 const hooray = new UIfx(require("./hooray.mp3"))
+const applause = new UIfx(require("./applause.mp3"))
 
-function FinishedComponent() {
+interface FinishedComponentProps {
+  onClick: () => void
+}
+
+function FinishedComponent(props: FinishedComponentProps) {
   console.log("rendering finished component")
   const trophies = ["./trophy.png", "./trophy.jpg", "./trophy2.jpg"]
   const randomTrophy = trophies[Math.floor(Math.random() * trophies.length)];
+  applause.play()
   return (
     <div className={"finishedDiv"}>
-      <img src={require(`${randomTrophy}`)} alt=""></img>
+      <img src={require(`${randomTrophy}`)} alt="" onClick={() => props.onClick()}></img>
     </div> 
   );
 }
@@ -25,9 +31,9 @@ interface SquareProps extends SquareData {
 }
 
 class Square extends React.Component<SquareProps> {
-  constructor(props: SquareProps) {
-    super(props)
-  }
+  // constructor(props: SquareProps) {
+  //   super(props)
+  // }
 
   shouldComponentUpdate(nextProps: SquareProps, nextState: any) {
     if (nextProps.flipped !== this.props.flipped) return true;
@@ -53,6 +59,7 @@ class Square extends React.Component<SquareProps> {
             ? <img src={require(`${props.url}`)} alt=""></img>
             : <img src={require("./peppa.png")} alt=""></img>
           }
+
       </span> 
     );
   }
@@ -84,14 +91,22 @@ function shuffle(a: any[]) {
 class Game extends React.Component<GameProps, GameState> {
   myTimeout: any
 
-  constructor(props: GameProps) {
-    super(props)
+  restart(props: GameProps) {
     const arr = [...Array(props.numberOfPairs * 2)].map((ign, _) => _%(props.numberOfPairs))
     shuffle(arr)
     this.state = {
       squares: [...Array(props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false, invalid: false})),
       finished: false,
     }
+    this.setState({
+      squares: this.state.squares,
+      finished: false
+    })
+  }
+
+  constructor(props: GameProps) {
+    super(props)
+    this.restart(props)
   }
 
   renderSquare(i: number) {
@@ -178,14 +193,14 @@ class Game extends React.Component<GameProps, GameState> {
   render() {
     return <div className="game">
       {Array(this.props.numberOfPairs * 2).fill(null).map((n, idx) => this.renderSquare(idx))}
-      {(this.state.finished === true) ? <FinishedComponent /> : ""}
+      {(this.state.finished === true) ? <FinishedComponent onClick={() => this.restart(this.props)}/> : ""}
     </div>;
   }
 }
 
 const App: React.FC = () => {
   return (
-    <Game numberOfPairs={3} squareSide={150}/>
+    <Game numberOfPairs={6} squareSide={150}/>
   );
 }
 
