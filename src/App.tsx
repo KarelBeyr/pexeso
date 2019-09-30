@@ -130,29 +130,6 @@ class Game extends React.Component<GameProps, GameState> {
       }
   }
 
-  solveFlipped() {
-    console.log("Solving flipped")
-    const s = this.state.squares.slice();
-    const flippedNonSolved = s.filter(_ => _.flipped === true && _.solved === false)
-    if (flippedNonSolved.length === 2) {
-      if (flippedNonSolved[0].url === flippedNonSolved[1].url) {
-        flippedNonSolved.forEach(_ => _.solved = true)
-        hooray.play()
-        console.log("SETTING NEW STATE (BECAUSE FOUND MATCH)");
-        this.setState({
-          squares: s
-        })
-          }
-
-    }
-    if (s.filter(_ => _.solved === false).length === 0) {
-      this.setState({
-        finished: true
-      })
-     //   alert("finish")
-    }
-  }
-
   handleClick(i: number): void {
     console.log("handling click" + i)
     const s = this.state.squares.slice();
@@ -162,7 +139,23 @@ class Game extends React.Component<GameProps, GameState> {
     s[i].flipped = true;
     console.log("SETTING NEW STATE (BECAUSE CLICKED)");
     this.setState({squares: s})
-    setTimeout(() => this.solveFlipped(), 500)
+    console.log("Solving flipped")
+    const flippedNonSolved = s.filter(_ => _.flipped === true && _.solved === false)
+    if (flippedNonSolved.length === 2) {
+      if (flippedNonSolved[0].url === flippedNonSolved[1].url) {
+        flippedNonSolved.forEach(_ => _.solved = true)
+        hooray.play()
+        console.log("SETTING NEW STATE (BECAUSE FOUND MATCH)");
+        this.setState({
+          squares: s
+        })
+      }
+    }
+    if (s.filter(_ => _.solved === false).length === 0) {
+      this.setState({
+        finished: true
+      })
+    }
     if (this.myTimeout) clearTimeout(this.myTimeout)
     this.myTimeout = setTimeout(() => this.flipNonSolved(), 2000)
   }
@@ -177,7 +170,7 @@ class Game extends React.Component<GameProps, GameState> {
 
 const App: React.FC = () => {
   return (
-    <Game numberOfPairs={6} squareSide={150}/>
+    <Game numberOfPairs={3} squareSide={150}/>
   );
 }
 
