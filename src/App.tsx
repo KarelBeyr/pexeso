@@ -91,22 +91,25 @@ function shuffle(a: any[]) {
 class Game extends React.Component<GameProps, GameState> {
   myTimeout: any
 
-  restart(props: GameProps) {
-    const arr = [...Array(props.numberOfPairs * 2)].map((ign, _) => _%(props.numberOfPairs))
+  freshSquares() {
+    const arr = [...Array(this.props.numberOfPairs * 2)].map((ign, _) => _%(this.props.numberOfPairs))
     shuffle(arr)
-    this.state = {
-      squares: [...Array(props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false, invalid: false})),
-      finished: false,
-    }
+    return [...Array(this.props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false, invalid: false}))
+  }
+
+  restart() {
     this.setState({
-      squares: this.state.squares,
+      squares: this.freshSquares(),
       finished: false
     })
   }
 
   constructor(props: GameProps) {
     super(props)
-    this.restart(props)
+    this.state = {
+      squares: this.freshSquares(),
+      finished: false,
+    }
   }
 
   renderSquare(i: number) {
@@ -193,7 +196,7 @@ class Game extends React.Component<GameProps, GameState> {
   render() {
     return <div className="game">
       {Array(this.props.numberOfPairs * 2).fill(null).map((n, idx) => this.renderSquare(idx))}
-      {(this.state.finished === true) ? <FinishedComponent onClick={() => this.restart(this.props)}/> : ""}
+      {(this.state.finished === true) ? <FinishedComponent onClick={() => this.restart()}/> : ""}
     </div>;
   }
 }
