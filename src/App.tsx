@@ -5,7 +5,6 @@ import UIfx from 'uifx'
 //sounds from www.myinstants.com
 
 const bell = new UIfx(require("./bump.mp3"))
-const wrong = new UIfx(require("./wrong.mp3"))
 const hooray = new UIfx(require("./hooray.mp3"))
 const applause = new UIfx(require("./applause.mp3"))
 
@@ -36,9 +35,7 @@ class Square extends React.Component<SquareProps> {
   // }
 
   shouldComponentUpdate(nextProps: SquareProps, nextState: any) {
-    if (nextProps.flipped !== this.props.flipped) return true;
-    if (nextProps.invalid !== this.props.invalid) return true;
-    return false;
+    return (nextProps.flipped !== this.props.flipped)
   }
 
   render() {
@@ -48,11 +45,9 @@ class Square extends React.Component<SquareProps> {
       width: props.squareSide + 'px',
       height: props.squareSide + 'px',
     }
-    let cn = "square";
-    if (props.invalid === true) cn = cn + " invalidSquare";
     return (
       <span
-        className={cn}
+        className={"square"}
         style={divStyle}
         onMouseDown={() => props.onClick()} >
           {props.flipped
@@ -73,7 +68,6 @@ interface SquareData {
   url: string
   solved: boolean
   flipped: boolean
-  invalid: boolean
 }
 interface GameState {
   squares: SquareData[]
@@ -94,7 +88,7 @@ class Game extends React.Component<GameProps, GameState> {
   freshSquares() {
     const arr = [...Array(this.props.numberOfPairs * 2)].map((ign, _) => _%(this.props.numberOfPairs))
     shuffle(arr)
-    return [...Array(this.props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false, invalid: false}))
+    return [...Array(this.props.numberOfPairs * 2)].map((ign, _) => ({url: "./peppa" + arr[_] + ".png", solved: false, flipped: false}))
   }
 
   restart() {
@@ -118,7 +112,6 @@ class Game extends React.Component<GameProps, GameState> {
       onClick={() => this.handleClick(i)}
       flipped={this.state.squares[i].flipped}
       solved={this.state.squares[i].solved}
-      invalid={this.state.squares[i].invalid}
       url={this.state.squares[i].url}
       squareSide={this.props.squareSide}
     />;
@@ -160,28 +153,9 @@ class Game extends React.Component<GameProps, GameState> {
     }
   }
 
-  clearInvalid(i: number) {
-    console.log("clearing invalid" + i)
-    const s = this.state.squares.slice();
-    if (this.state.squares[i].invalid === true) {
-      s[i].invalid = false;
-      console.log("SETTING NEW STATE");
-      this.setState({squares: s})
-    }
-  }
-
   handleClick(i: number): void {
     console.log("handling click" + i)
     const s = this.state.squares.slice();
-    if (this.state.squares[i].flipped === true) {
-      wrong.play()
-      console.log("not possible to click on " + i)
-      s[i].invalid = true;
-      console.log("SETTING NEW STATE");
-      this.setState({squares: s})
-      setTimeout(() => this.clearInvalid(i), 500)
-      return;
-    }
     bell.play()
 
     this.flipNonSolved();
